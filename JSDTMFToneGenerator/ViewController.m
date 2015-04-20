@@ -25,20 +25,35 @@
 
 #import "ViewController.h"
 
+#import "JSDTMFToneGenerator.h"
+
 @interface ViewController ()
+
+@property (nonatomic, strong) JSDTMFToneGenerator *key1DTMFToneGenerator;
 
 @end
 
 @implementation ViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+
+    _key1DTMFToneGenerator = [JSDTMFToneGenerator dtmfToneGeneratorForKey:@"1"];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    [_key1DTMFToneGenerator playForDuration:0.5f];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    [_key1DTMFToneGenerator stop];
 }
 
 @end

@@ -27,10 +27,14 @@
 
 @interface JSDTMFToneGenerator : NSObject
 
++(instancetype)dtmfToneGeneratorForKey:(NSString*)key;
+
 -(instancetype)initWithFrequency:(NSUInteger)frequency;
 -(instancetype)initWithDTMFfrequency1:(NSUInteger)frequency1 frequency2:(NSUInteger)frequency2;
 
 -(void)play;
+-(void)playForDuration:(NSTimeInterval)duration;
+
 -(void)stop;
 
 @end

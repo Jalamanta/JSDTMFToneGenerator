@@ -38,10 +38,23 @@ static const AVAudioFrameCount kSamplesPerBuffer = 1024;
 @property (nonatomic, readonly) AVAudioPCMBuffer* pcmBufferOne;
 @property (nonatomic, readonly) AVAudioPCMBuffer* pcmBufferTwo;
 
+@property (nonatomic, readonly) NSTimer *timer;
+
 @end
 
+static NSDictionary *dtmfFrequencies = nil;
 
 @implementation JSDTMFToneGenerator
+
++(void)initialize
+{
+    if (dtmfFrequencies == nil)
+        dtmfFrequencies = @{ @"1" : @[ @(1209), @(697)], @"2": @[ @(1336), @(697)], @"3" : @[ @(1477), @(697)],
+                             @"4" : @[ @(1209), @(770)], @"5": @[ @(1336), @(770)], @"6" : @[ @(1477), @(770)],
+                             @"7" : @[ @(1209), @(852)], @"8": @[ @(1336), @(852)], @"9" : @[ @(1477), @(852)],
+                             @"*" : @[ @(1209), @(941)], @"0": @[ @(1336), @(941)], @"#" : @[ @(1477), @(941)]};
+    
+}
 
 -(NSUInteger)greatestCommonDivisor:(NSUInteger)firstValue secondValue:(NSUInteger)secondValue
 {
@@ -117,6 +130,17 @@ static const AVAudioFrameCount kSamplesPerBuffer = 1024;
     return self;
 }
 
++(instancetype)dtmfToneGeneratorForKey:(NSString*)key
+{
+    NSNumber *frequency1 = dtmfFrequencies[key][0];
+    NSNumber *frequency2 = dtmfFrequencies[key][1];
+
+    JSDTMFToneGenerator *dtmfToneGenerator = [[JSDTMFToneGenerator alloc] initWithDTMFfrequency1:[frequency1 integerValue]
+                                                                                      frequency2:[frequency2 integerValue]];
+    
+    return dtmfToneGenerator;
+}
+
 -(AVAudioPCMBuffer*)createAudioBufferWithLoopableSineWaveFrequency:(NSUInteger)frequency
 {
      AVAudioFormat *mixerFormat = [_mixerNode outputFormatForBus:0];
@@ -189,6 +213,13 @@ static const AVAudioFrameCount kSamplesPerBuffer = 1024;
     }
     
     
+}
+
+-(void)playForDuration:(NSTimeInterval)duration
+{
+    [self play];
+    
+    _timer = [NSTimer scheduledTimerWithTimeInterval:duration target:self selector:@selector(stop) userInfo:nil repeats:NO];
 }
 
 -(void)stop
